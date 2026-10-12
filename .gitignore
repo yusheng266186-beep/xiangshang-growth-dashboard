@@ -1,0 +1,19 @@
+# Student records, original workbooks and locally exported private pages stay local.
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.tsv
+*.json
+*.zip
+*.png
+*.jpg
+*.pdf
+.DS_Store
+private/
+real-data/
+work/
+node_modules/
+*_班成长奖励面板*.html
+*班成长奖励面板*.html
+*班教师管理看板*.html

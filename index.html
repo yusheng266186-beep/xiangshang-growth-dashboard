@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fbf8ef"><meta name="description" content="向上成长奖励面板，教师管理与学生展示的虚拟数据演示。">
+<title>向上 · 成长奖励面板</title>
+<style>
+:root{color-scheme:light;--ink:#284739;--muted:#758578;--green:#557c63;--line:#b5bba742}
+*{box-sizing:border-box}body{margin:0;background:#fbf8ef;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7}
+body:before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 14% 14%,#d9e4d46b,transparent 55%),radial-gradient(ellipse at 91% 70%,#e9dbba66,transparent 48%)}
+.shell{position:relative;max-width:1180px;margin:auto;padding:36px 40px}header{display:flex;justify-content:space-between;align-items:center;padding-bottom:26px;border-bottom:1px solid var(--line);gap:16px}a{color:inherit;text-decoration:none}.brand{font-family:'Songti SC',STSong,serif;font-size:28px;letter-spacing:.18em}.tag{font-size:12px;color:var(--muted);letter-spacing:.12em}.hero{padding:85px 0 45px}.eyebrow{color:var(--green);font-size:12px;letter-spacing:.25em}h1{font-family:'Songti SC',STSong,serif;font-size:clamp(40px,6vw,68px);font-weight:500;letter-spacing:.05em;line-height:1.35;margin:20px 0}p{margin:0;color:var(--muted)}.intro{max-width:610px;font-size:15px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0 36px}.card{position:relative;padding:32px;border:1px solid #ffffffca;background:linear-gradient(140deg,#ffffffb3,#ffffffe0 40%,#ffffff6b);border-radius:24px;box-shadow:0 15px 45px #455b4110,inset 0 1px #fff;backdrop-filter:blur(22px);transition:transform .3s,box-shadow .3s;overflow:hidden}.card:hover{transform:translateY(-5px);box-shadow:0 23px 48px #455b4118}.card:focus-visible{outline:2px solid var(--green);outline-offset:6px}.number{font-family:Georgia,serif;font-size:14px;color:#9ca991}.card h2{font-family:'Songti SC',STSong,serif;font-size:30px;font-weight:500;margin:15px 0 10px}.card p{font-size:14px;max-width:340px}.enter{display:flex;align-items:center;justify-content:space-between;margin-top:35px;font-size:13px;color:var(--green)}.arrow{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;font-size:20px;transition:transform .3s}.card:hover .arrow{transform:translateX(4px)}.privacy{display:flex;gap:14px;padding:22px 26px;background:#e4eadc6b;border:1px solid var(--line);border-radius:18px;font-size:13px}.privacy strong{display:block;font-weight:600;color:#47644f;margin-bottom:4px}.privacy p{font-size:12px}.dot{width:7px;height:7px;background:#76967b;border-radius:50%;margin-top:8px;flex-shrink:0;box-shadow:0 0 0 4px #76967b13}footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:32px 0 12px;font-size:11px;color:#8b9487}footer a:hover{text-decoration:underline}.star{position:absolute;width:240px;height:240px;right:15px;top:165px;color:#b0b69b35;animation:float 12s ease-in-out infinite;pointer-events:none;z-index:-1}
+@keyframes float{50%{transform:translateY(-15px) rotate(5deg)}}.hero,.cards,.privacy{animation:appear .7s both}.cards{animation-delay:.1s}.privacy{animation-delay:.2s}@keyframes appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:700px){.shell{padding:24px}.hero{padding:55px 0 28px}.cards{grid-template-columns:1fr;gap:16px}.card{padding:26px}.star{right:0;top:130px;width:150px;height:150px}.tag{font-size:10px}.privacy{padding:20px}}
+@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body><main class="shell">
+<header><a class="brand" href="./index.html">向上</a><span class="tag">成长奖励面板 · 公开演示</span></header>
+<svg class="star" viewBox="0 0 200 200" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="100" cy="100" r="82"/><circle cx="100" cy="100" r="57"/><path d="m100 5 17 73 78 22-78 22-17 73-17-73L5 100l78-22Z"/><path d="m40 40 120 120M160 40 40 160"/></svg>
+<section class="hero"><div class="eyebrow">每一次成长，都值得看见</div><h1>让进步有迹可循。</h1><p class="intro">从成绩导入到奖励设置，再到学生自己的成长记录。两个面板，共用一套清晰的奖励规则。</p></section>
+<section class="cards" aria-label="选择演示面板">
+<a class="card" href="./teacher.html"><span class="number">01 / TEACHER</span><h2>教师管理看板</h2><p>导入本地表格，选择考试与班级，设置奖励金额，一键生成学生面板。</p><span class="enter">打开教师演示<span class="arrow" aria-hidden="true">↗</span></span></a>
+<a class="card" href="./student.html"><span class="number">02 / STUDENT</span><h2>学生成长面板</h2><p>查看成长轨迹、奖励明细与学科行动，把下一次进步化为具体目标。</p><span class="enter">打开学生演示<span class="arrow" aria-hidden="true">↗</span></span></a>
+</section>
+<aside class="privacy"><span class="dot" aria-hidden="true"></span><div><strong>全部展示数据均为虚构</strong><p>演示使用24位虚拟同学与独立生成的成绩。仓库不含真实学生资料或原始表格。教师版导入的文件只在当前浏览器内处理，导出的页面保存到本地。</p></div></aside>
+<footer><span>向上 · 让努力留下刻度</span><a href="https://github.com/yusheng266186-beep/xiangshang-growth-dashboard" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a></footer>
+</main></body></html>
