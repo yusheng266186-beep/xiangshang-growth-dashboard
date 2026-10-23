@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const allowed = new Set(['index.html','teacher.html','student.html','README.md','.gitignore','.nojekyll','scripts/verify-public-data.mjs','tests/import-roster.test.mjs']);
+const allowed = new Set(['index.html','teacher.html','student.html','README.md','.gitignore','.nojekyll','scripts/verify-public-data.mjs','tests/import-roster.test.mjs','tests/payment-management.test.mjs']);
 async function inventory(dir = root) {
   for (const entry of await fs.readdir(dir, {withFileTypes:true})) {
     if (entry.name === '.git') continue;
