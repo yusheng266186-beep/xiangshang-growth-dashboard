@@ -1435,6 +1435,11 @@ input[type=range]::-moz-range-thumb{transition:scale .28s var(--liquid-spring),b
 const DATA_INITIAL=JSON.parse(document.getElementById('embedded-data').textContent);
 const clone=value=>typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value));
 let DATA=clone(DATA_INITIAL);
+function syncPublicDataBanner(){
+ const label=document.querySelector('.public-demo-banner > span');
+ if(label)label.textContent=DATA.demo===true?'公开演示 · 姓名、成绩和奖励均为虚构':'本地班级数据 · 仅在当前浏览器处理';
+}
+syncPublicDataBanner();
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=(n,d=1)=>Number.isFinite(n)?n.toFixed(d):'—';
