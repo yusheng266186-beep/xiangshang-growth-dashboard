@@ -10,6 +10,8 @@ function section(start,end){
  return html.slice(from,to);
 }
 const code=[section('function archiveKey(', 'function settingField('),
+ section('function chooseReferenceDefaults(', 'async function importPreview('),
+ section('function assertImportLedgerPreserved(', 'async function candidateFromWorkbook('),
  section('async function importPreview(', 'async function refreshImportPreview(')].join('\n');
 const roster=()=>Array.from({length:3},(_,i)=>({id:`local-${i+1}`,name:`虚拟新班同学${i+1}`,class:4}));
 function workspace(demo=false,classNo=4){return {demo,config:{track:'physics',classNo},
@@ -61,4 +63,33 @@ test('demo ledgers are isolated while formal class archives and payment snapshot
  assert.deepEqual(archives['physics-4'].payments,demo.payments);
  assert.deepEqual(archives['physics-4'].lockSnapshots,demo.lockSnapshots);
  assert.ok(!archives['physics-4'].classArchive);
+});
+test('a workbook containing only a new exam updates the saved class without resetting its references',async()=>{
+ const data=workspace(),{ctx,ui}=setup(data),next={...ui.groups.get('sample-next'),id:'sample-later',label:'后续虚拟考试',order:0};
+ data.exams[1].status='已锁定';data.payments=[{id:'sample-receipt',cents:250}];data.lockSnapshots={'sample-first':{total:600}};
+ ui.groups=new Map([[next.id,next]]);ui.examId=next.id;
+ ctx.chooseReferenceDefaults();
+ assert.equal(ui.baselineId,'sample-base');assert.equal(ui.firstId,'sample-first');
+ const preview=await ctx.importPreview();assert.equal(preview.mode,'update');assert.equal(preview.existing,data);
+ assert.deepEqual([...preview.examIds],['sample-later']);assert.equal(preview.existing.payments[0].cents,250);
+});
+test('import ledger guard rejects discarded payments, changed snapshots and overwritten locked exams',()=>{
+ const data=workspace(),{ctx}=setup(data);
+ data.payments=[{id:'sample-receipt',cents:250}];data.lockSnapshots={'sample-first':{total:600}};data.exams[1].status='已锁定';
+ const unchanged=structuredClone(data);unchanged.exams.push({id:'sample-later',kind:'reward'});
+ assert.doesNotThrow(()=>ctx.assertImportLedgerPreserved(unchanged,data));
+ const noPayments=structuredClone(unchanged);noPayments.payments=[];
+ assert.throws(()=>ctx.assertImportLedgerPreserved(noPayments,data),/已兑换/);
+ const differentSnapshot=structuredClone(unchanged);differentSnapshot.lockSnapshots['sample-first'].total=500;
+ assert.throws(()=>ctx.assertImportLedgerPreserved(differentSnapshot,data),/已确认奖金/);
+ const differentExam=structuredClone(unchanged);differentExam.exams[1].label='changed';
+ assert.throws(()=>ctx.assertImportLedgerPreserved(differentExam,data),/不能覆盖已确认考试/);
+});
+test('latest-score ordering is descending, puts absences last and keeps internal IDs unchanged',()=>{
+ const ctx=vm.createContext({});
+ vm.runInContext(section('function studentsByLatestScore(', 'function studentPublicLabel('),ctx);
+ const data={config:{classNo:4},students:[{id:'c4-001',name:'虚拟同学甲'},{id:'c4-002',name:'虚拟同学乙'},{id:'c4-003',name:'虚拟同学丙'},{id:'c4-004',name:'虚拟同学丁'}],
+ exams:[{records:[{id:'c4-001',class:4,total:700}]},{records:[{id:'c4-001',class:4,total:0},{id:'c4-002',class:4,total:650},{id:'c4-004',class:4,total:500}]}]};
+ const original=JSON.stringify(data),sorted=ctx.studentsByLatestScore(data);
+ assert.deepEqual([...sorted].map(s=>s.id),['c4-002','c4-004','c4-001','c4-003']);assert.equal(JSON.stringify(data),original);
 });
