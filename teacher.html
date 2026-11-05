@@ -2403,7 +2403,7 @@ function download(name,content,type){const blob=new Blob([content],{type:type??'
 
 
 function csvQuote(v){return '"'+String(v??'').replaceAll('"','""')+'"';}function csv(rows){return '\ufeff'+rows.map(r=>r.map(csvQuote).join(',')).join('\r\n');}
-function handleAction(action){if(action==='first-reward'){state.exam=DATA.exams.findIndex(e=>e.id===DATA.analysisSources.firstRewardExamId);return go('personal','reward');}if(action==='effort')return modal('本场四项奖金',window.createSolarRuleContent({get DATA(){return DATA;},state,frame,getBook:()=>book,schoolStats,forecast,rankEffortModel}).effortHTML());if(action==='dynamic-reference')return modal('首月年级参照与近期成果',protectionView());if(['ranks','personal','reward'].includes(action))return go('personal',action==='personal'?'profile':action);if(action==='prev'||action==='next'){const list=visibleRosterStudents();if(!list.length)return;const i=list.findIndex(s=>s.id===state.student),offset=action==='prev'?-1:1;return selectStudent(list[(i+offset+list.length)%list.length].id,{reveal:true});}if(action==='print')return window.print();if(action==='export-html')return exportHTML();if(action==='export-json'){download('向上_'+DATA.config.classNo+'班教师完整备份.json',JSON.stringify(DATA,null,2),'application/json');return toast('完整备份已导出。');}if(action==='import-json')return importJSON();if(action==='import-csv')return importCSV();if(action==='csv-template'){download('下一场成绩_导入模板.csv',csv([['班级','姓名','赋分总分','语文','数学','英语','物理','化学原分','生物原分'],...DATA.students.map(s=>[4,s.name,'','','','','','',''])]),'text/csv;charset=utf-8');return toast('请同时补齐整个参考范围成绩。');}if(action==='export-ledger'){const rows=[['规则版本','编号','姓名','考试','状态','真实年级平均名次','班内名次_分析','计奖等价年级','参与元','稳定元','年级进步元','学校目标元','本场合计元','已兑换元','剩余可领元','稳定点','进步点','目标点','学校特控线','学校本科线']];for(const f of book.frames)for(const s of DATA.students){const r=f.rows.find(x=>x.id===s.id),b=f.exam.kind==='baseline',p=paidFor(DATA,s.id,f.exam.id),a=f.allocation.amounts[s.id];rows.push([14,s.id,s.name,f.exam.label,b?'起点':f.ready?f.exam.status:'待核验',f.exam.scope==='full'?r.gr?.avg:'',r.cr?.avg,r.equivalentGrade,...['participation','stability','progress','target'].map(k=>b?0:f.ready?r.cash[k]/100:'待核验'),a===null?'待核验':a/100,p/100,!b&&f.ready&&f.exam.status==='已锁定'?(a-p)/100:0,r.points.stability,r.points.progress,r.points.target,f.lines.special??'',f.lines.bachelor??'']);}download(DATA.config.classNo+'班奖金账_第14版.csv',csv(rows),'text/csv;charset=utf-8');return toast('第14版四项奖金与兑换记录已导出。');}if(action==='save-goal'||action==='action-card')return actionCard();}
+function handleAction(action){if(action==='previous-backup')return exportPreviousTeacherBackup();if(action==='first-reward'){state.exam=DATA.exams.findIndex(e=>e.id===DATA.analysisSources.firstRewardExamId);return go('personal','reward');}if(action==='effort')return modal('本场四项奖金',window.createSolarRuleContent({get DATA(){return DATA;},state,frame,getBook:()=>book,schoolStats,forecast,rankEffortModel}).effortHTML());if(action==='dynamic-reference')return modal('首月年级参照与近期成果',protectionView());if(['ranks','personal','reward'].includes(action))return go('personal',action==='personal'?'profile':action);if(action==='prev'||action==='next'){const list=visibleRosterStudents();if(!list.length)return;const i=list.findIndex(s=>s.id===state.student),offset=action==='prev'?-1:1;return selectStudent(list[(i+offset+list.length)%list.length].id,{reveal:true});}if(action==='print')return window.print();if(action==='export-html')return exportHTML();if(action==='export-json'){download('向上_'+DATA.config.classNo+'班教师完整备份.json',JSON.stringify(DATA,null,2),'application/json');return toast('完整备份已导出。');}if(action==='import-json')return importJSON();if(action==='import-csv')return importCSV();if(action==='csv-template'){download('下一场成绩_导入模板.csv',csv([['班级','姓名','赋分总分','语文','数学','英语','物理','化学原分','生物原分'],...DATA.students.map(s=>[4,s.name,'','','','','','',''])]),'text/csv;charset=utf-8');return toast('请同时补齐整个参考范围成绩。');}if(action==='export-ledger'){const rows=[['规则版本','编号','姓名','考试','状态','真实年级平均名次','班内名次_分析','计奖等价年级','参与元','稳定元','年级进步元','学校目标元','本场合计元','已兑换元','剩余可领元','稳定点','进步点','目标点','学校特控线','学校本科线']];for(const f of book.frames)for(const s of DATA.students){const r=f.rows.find(x=>x.id===s.id),b=f.exam.kind==='baseline',p=paidFor(DATA,s.id,f.exam.id),a=f.allocation.amounts[s.id];rows.push([14,s.id,s.name,f.exam.label,b?'起点':f.ready?f.exam.status:'待核验',f.exam.scope==='full'?r.gr?.avg:'',r.cr?.avg,r.equivalentGrade,...['participation','stability','progress','target'].map(k=>b?0:f.ready?r.cash[k]/100:'待核验'),a===null?'待核验':a/100,p/100,!b&&f.ready&&f.exam.status==='已锁定'?(a-p)/100:0,r.points.stability,r.points.progress,r.points.target,f.lines.special??'',f.lines.bachelor??'']);}download(DATA.config.classNo+'班奖金账_第14版.csv',csv(rows),'text/csv;charset=utf-8');return toast('第14版四项奖金与兑换记录已导出。');}if(action==='save-goal'||action==='action-card')return actionCard();}
 function actionCard(){const rows=subjectActionModels();modal('六科薄弱与行动',`<div class="row wrap"><span class="tag">${esc(displayName(student()))}</span><span class="mini-label">${esc(exam().label)} · 页面查看</span></div><p class="action-intro">每天选1—2科执行，先做优先科目；其余作为备选，不必同时做完。</p><div class="six-subject-actions">${rows.map(m=>`<article class="subject-action-card"><div class="row between"><h3>${m.subject}</h3><span class="tag ${m.priority?'gold':'gray'}">${m.priority?'优先复盘':'巩固检查'}</span></div><p class="action-score">${Number.isFinite(m.raw)?fmt(m.raw,1)+'分':'成绩待补齐'}${m.rank?' · 同科'+m.rank+' / '+m.n+'人':''}</p><div class="action-weakness"><strong>${m.items.length?'本卷薄弱线索':'待核对的方向'}</strong><p>${esc(m.reason)}</p></div><div><strong>怎么做</strong><p>${esc(m.measure)}</p></div><div class="action-recheck"><strong>怎样检验</strong><p>${esc(m.check)}</p></div>${m.inferred?'<small class="mini-label">以上措施为通用建议，具体薄弱请结合试卷与老师反馈确认。</small>':''}</article>`).join('')}</div><button class="btn primary" id="action-done">看完了，回到页面</button>`);$('.modal')?.classList.add('learning-modal');$('#action-done').onclick=closeModal;}
 
 function parseCSV(text){const rows=[];let row=[],value='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i];if(ch==='"'){if(quoted&&text[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if(ch===','&&!quoted){row.push(value.trim());value='';}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(value.trim());if(row.some(Boolean))rows.push(row);row=[];value='';}else value+=ch;}if(quoted)throw Error('CSV引号没有闭合。');row.push(value.trim());if(row.some(Boolean))rows.push(row);return rows;}
@@ -2591,7 +2591,53 @@ function teacherAction(action){
  if(action==='export-payment-summary'){download(DATA.config.classNo+'班累计奖励账户汇总.csv',paymentSummaryCSV(),'text/csv;charset=utf-8');return toast('累计账户汇总已导出，恢复账目请使用发放明细或完整备份。');}
 }
 
-function importJSON(){const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.onchange=async()=>{try{const file=input.files[0];if(!file)return;if(file.size>10*1024*1024)throw Error('备份文件过大。');const data=JSON.parse(await file.text());validateData(data);modal('恢复教师完整备份',`<p>${data.exams.length}场考试 · ${data.payments.filter(p=>p.kind==='payment').length}条发放记录 · ${Object.keys(data.teacherNotes).length}份跟进笔记。</p><div class="hint">已确认成绩和现有发放记录必须完整保留。旧备份不能删掉新发放，更正记录须通过发放页追加。</div>`,()=>{try{validateData(data);DATA=data;state.exam=data.exams.length-1;state.student=studentsByLatestScore()[0].id;TeacherUI.compareTo=state.exam;TeacherUI.compareFrom=0;TeacherUI.peerId=null;TeacherUI.paymentExam='all';TeacherUI.paymentStudent='all';WorkbookUI.workbook=null;WorkbookUI.groups=null;WorkbookUI.preview=null;WorkbookUI.fileName='';WorkbookUI.error='';WorkbookUI.plans=null;WorkbookUI.settingDraft=null;touchTeacher();UI.view=null;UI.snapshots.clear();render({resetForms:true,recalculate:true});toast('教师完整备份已恢复并自动保存，成绩、确认奖金与累计发放均已带入。');}catch(e){toast('未恢复：'+e.message);}});}catch(e){toast('未导入：'+e.message);}};input.click();}
+function teacherBackupSummary(data,ledger=RewardEngine.build(data)){
+ const amounts=data.students.reduce((sum,s)=>{const w=walletModel(s.id,data,ledger);for(const key of ['calculated','confirmed','paid','remaining'])sum[key]+=w[key];return sum;},{calculated:0,confirmed:0,paid:0,remaining:0});
+ return {school:data.school,classNo:data.config.classNo,students:data.students.length,exams:data.exams.length-1,payments:data.payments.filter(p=>p.kind==='payment').length,...amounts};
+}
+function prepareTeacherBackup(data){
+ const ledger=validateData(data,{independent:true});
+ let conflictReason='';try{validateData(data);}catch(e){conflictReason=e.message;}
+ return {summary:teacherBackupSummary(data,ledger),conflictReason};
+}
+function applyTeacherBackup(data,{persisted=false}={}){
+ DATA=clone(data);state.exam=DATA.exams.length-1;state.student=studentsByLatestScore()[0].id;
+ TeacherUI.compareTo=state.exam;TeacherUI.compareFrom=0;TeacherUI.peerId=null;TeacherUI.paymentExam='all';TeacherUI.paymentStudent='all';
+ Object.assign(WorkbookUI,{workbook:null,groups:null,preview:null,fileName:'',error:'',plans:null,settingDraft:null});
+ if(persisted)TeacherUI.dirty=false;else touchTeacher();
+ UI.view=null;UI.snapshots.clear();render({resetForms:true,recalculate:true});
+}
+function showTeacherBackup(data,fileName){
+ const plan=prepareTeacherBackup(data),incoming=plan.summary;
+ if(!plan.conflictReason){
+  modal('恢复教师完整备份',`<p>${esc(fileName)} · ${data.exams.length}场考试 · ${incoming.payments}条发放记录。</p><div class="hint">累计已发放 ${money(incoming.paid)}，剩余可领 ${money(incoming.remaining)}。恢复时保留已确认成绩和现有发放记录。</div>`,()=>{try{validateData(data);applyTeacherBackup(data);toast('教师完整备份已恢复并自动保存，可生成最新学生版。');}catch(e){toast('未恢复：'+e.message);}});
+  return;
+ }
+ const before=JSON.stringify(DATA),current=teacherBackupSummary(DATA);
+ const row=(label,a,b)=>'<tr><td>'+label+'</td><td>'+a+'</td><td>'+b+'</td></tr>';
+ modal('切换为这份完整备份',`<p>${esc(fileName)}</p><div class="hint">当前工作区已有已确认数据，与这份备份不同。切换会使用备份中的完整成绩、参考线、奖励设置和发放记录。</div><p class="micro">普通恢复被拦截的原因：${esc(plan.conflictReason)}</p><div class="table-wrap section-space"><table class="backup-comparison"><thead><tr><th>核对项目</th><th>当前工作区</th><th>选中的备份</th></tr></thead><tbody>${row('班级',esc(current.school)+' · '+current.classNo+'班',esc(incoming.school)+' · '+incoming.classNo+'班')}${row('学生 / 计奖考试',current.students+'人 / '+current.exams+'场',incoming.students+'人 / '+incoming.exams+'场')}${row('累计已确认',money(current.confirmed),money(incoming.confirmed))}${row('累计已发放',money(current.paid),money(incoming.paid))}${row('剩余可领',money(current.remaining),money(incoming.remaining))}</tbody></table></div><p class="rule-note">切换前会下载当前工作区的完整JSON，并在本机另存一份。两套账目分别保留，发放金额不会相加。</p><label class="row touch-check"><input id="backup-replace-check" type="checkbox">我已核对，将以选中的完整备份为准。</label><div id="backup-restore-error" role="alert"></div><div class="row wrap section-space"><button class="btn" id="backup-replace-cancel">保留当前数据</button><button class="btn primary" id="backup-replace-confirm" disabled>备份当前数据并切换</button></div>`);
+ $('#backup-replace-cancel').onclick=closeModal;
+ $('#backup-replace-check').onchange=e=>$('#backup-replace-confirm').disabled=!e.target.checked;
+ $('#backup-replace-confirm').onclick=async()=>{
+  const button=$('#backup-replace-confirm'),check=$('#backup-replace-check');if(button.disabled||!check.checked)return;button.disabled=true;check.disabled=true;
+  try{
+   if(JSON.stringify(DATA)!==before)throw Error('当前工作区已有变化，请重新选择备份并核对。');
+   validateData(data,{independent:true});
+   const previous=clone(DATA),next=clone(data);next.revision=Math.max(previous.revision??0,next.revision??0)+1;next.updatedAt=new Date().toISOString();
+   download('向上_'+previous.config.classNo+'班_切换前完整备份_'+todayLocal()+'.json',JSON.stringify(previous,null,2),'application/json');
+   await window.TeacherPersistence.replace(next,previous);
+   applyTeacherBackup(next,{persisted:true});closeModal();toast('已切换并自动保存。旧工作区已另存备份，可在设置页导出。');
+  }catch(e){const error=$('#backup-restore-error');if(error)error.textContent='未切换：'+e.message;button.disabled=false;check.disabled=false;}
+ };
+}
+async function exportPreviousTeacherBackup(){
+ try{const data=await window.TeacherPersistence.previous();if(!data)throw Error('还没有切换前的备份。');download('向上_'+data.config.classNo+'班_切换前完整备份.json',JSON.stringify(data,null,2),'application/json');toast('切换前的完整备份已导出，当前账目不变。');}catch(e){toast(e.message);}
+}
+function importJSON(){
+ const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+ input.onchange=async()=>{try{const file=input.files?.[0];if(!file)return;if(file.size>10*1024*1024)throw Error('备份文件过大。');showTeacherBackup(JSON.parse(await file.text()),file.name);}catch(e){toast('未导入：'+e.message);}};input.click();
+}
+
 
 /* validateData is defined in the Excel setup module. */
 
@@ -2801,7 +2847,7 @@ function teacherDataView(){
  const filePanel='<section class="card workbook-import"><div class="card-head"><div><div class="studio-section-title"><span class="studio-section-index">01</span><h2>从一份成绩表开始</h2></div><p class="micro">直接读取质量复盘工作簿，也支持带考试、班级、姓名和总分的成绩表。</p></div><span class="tag gray">Excel</span></div><div class="workbook-upload '+(WorkbookUI.loading?'is-reading':'')+'"><div class="upload-main"><div class="upload-orbit">'+uploadIcon+'</div><div><span class="upload-kicker">'+(WorkbookUI.loading?'READING YOUR WORKBOOK':loaded?'WORKBOOK READY':'YOUR NEXT CHAPTER')+'</span><h3 class="upload-title '+(loaded?'is-filename':'')+'">'+(WorkbookUI.loading?'正在读入这份成绩…':loaded?esc(WorkbookUI.fileName):'把成绩表，轻轻放在这里。')+'</h3><span class="upload-note">'+(WorkbookUI.loading?'正在核对考试、班级与学生记录':loaded?'已读入考试、学校参考线与小题记录':'拖入 .xlsx 文件，或点击下方选择成绩表')+'</span></div></div><div class="upload-actions"><button type="button" class="btn" data-studio-file '+(WorkbookUI.loading?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>'+(loaded?'更换成绩表':'选择成绩表')+'</button><span class="upload-note">XLSX · 本地读取<br>成绩只保留在你的文件里</span></div><input id="workbook-file" type="file" accept=".xlsx" aria-label="选择Excel成绩表" '+(WorkbookUI.loading?'disabled':'')+'>'+(WorkbookUI.loading?'<div class="upload-progress" role="status" aria-label="正在读取表格"><i></i></div>':'')+'</div><div id="wb-feedback" role="status">'+(WorkbookUI.error?'<div class="hint error">'+esc(WorkbookUI.error)+'</div>':'')+'</div>'+workbookSelectionHTML()+(!WorkbookUI.groups?'<div class="studio-current-file"><i></i><span>当前文件已含 <b>'+cfg.classNo+'班 · '+esc(latest.exam.label)+'</b>，有效成绩 '+Object.keys(latest.ranks.class).length+'人。导入新表后可在这里选择其他考试与班级。</span></div>':'')+'</section>';
  const settings=setupSettingsHTML().replace('<h2>奖励金额设置</h2>','<div class="studio-section-title"><span class="studio-section-index">02</span><h2>给努力一份回报</h2></div>');
  const ledger=setupLedgerHTML().replace('<h2>考试与奖励核验</h2>','<div class="studio-section-title"><span class="studio-section-index">03</span><h2>让每一场都有记录</h2></div>');
- const save='<section class="card studio-bottom"><div><div class="card-head"><h2>把今天的设置，带到教室里。</h2></div><p>保存教师版保留成绩、奖励设置与账目，再生成学生版展示成长。学生版会带上当前班级的最新成绩、奖金和余额。</p></div><div><div class="row"><button class="btn" data-action="export-html">保存教师版</button><button class="btn primary" data-teacher-action="export-student">生成学生面板 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button></div><div class="backup-links"><button class="btn" data-action="export-json">导出完整备份</button><button class="btn" data-action="import-json">恢复完整备份</button></div></div></section>';
+ const save='<section class="card studio-bottom"><div><div class="card-head"><h2>把今天的设置，带到教室里。</h2></div><p>保存教师版保留成绩、奖励设置与账目，再生成学生版展示成长。学生版会带上当前班级的最新成绩、奖金和余额。</p></div><div><div class="row"><button class="btn" data-action="export-html">保存教师版</button><button class="btn primary" data-teacher-action="export-student">生成学生面板 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button></div><div class="backup-links"><button class="btn" data-action="export-json">导出完整备份</button><button class="btn" data-action="import-json">恢复完整备份</button>'+(window.TeacherPersistence?.previousAvailable?'<button class="btn" data-action="previous-backup">导出切换前备份</button>':'')+'</div></div></section>';
  return intro+steps+'<div class="studio-workbench">'+filePanel+settings+'</div>'+ledger+save;
 }
 function readPlanInputs(){const plans=setupPlans();for(let i=0;i<plans.length;i++){const label=$('.setup-plan-label[data-plan="'+i+'"]'),budget=$('.setup-plan-budget[data-plan="'+i+'"]'),base=$('.setup-plan-base[data-plan="'+i+'"]');if(label){plans[i]={...plans[i],label:label.value.trim(),budget:Number(budget.value),base:Number(base.value)}}}return plans;}
@@ -2901,7 +2947,7 @@ async function applyWorkbook(exportStudent=false){
  try{const confirmMissing=$('#wb-absence')?.checked??false;WorkbookUI.date=$('#wb-date').value;const candidate=await candidateFromWorkbook({confirmMissing,rewardConfig:settingsFromForm()});DATA=candidate;state.exam=DATA.exams.length-1;state.student=studentsByLatestScore()[0].id;TeacherUI.sort='rank';TeacherUI.compareTo=state.exam;TeacherUI.compareFrom=0;TeacherUI.peerId=null;TeacherUI.paymentExam=null;WorkbookUI.plans=null;WorkbookUI.settingDraft=null;await importPreview();touchTeacher();UI.view=null;UI.snapshots.clear();render({recalculate:true,resetForms:true});$('#wb-feedback').innerHTML='<div class="hint">'+DATA.config.classNo+'班 · '+WorkbookUI.examId+'已应用；'+(book.frames.at(-1).ready?'已计算 '+money(book.frames.at(-1).allocation.total):'成绩或学校线待核验，尚未计算奖金')+'。请保存教师版。</div>';if(exportStudent)teacherAction('export-student');}
  catch(e){setupError(e.message)}finally{if($('#wb-apply'))$('#wb-apply').disabled=false}
 }
-function validateAcademicData(data){
+function validateAcademicData(data,{independent=false}={}){
  if(!data||data.version!==6||data.config?.rewardPolicy?.version!==14||!Array.isArray(data.students)||!Array.isArray(data.exams))throw Error('请选择完整教师备份。');
  const cfg=data.config,c=cfg.gradeReward;if(!Number.isInteger(cfg.classNo)||cfg.classNo<1||!data.students.length||data.students.length>200||new Set(data.students.map(s=>s.id)).size!==data.students.length||new Set(data.students.map(s=>s.name)).size!==data.students.length)throw Error('班级名单或固定编号无效。');
  for(const s of data.students)if(typeof s.id!=='string'||!s.id||typeof s.name!=='string'||!s.name.trim()||s.class!==cfg.classNo)throw Error('学生身份与班级不一致。');
@@ -2911,7 +2957,7 @@ function validateAcademicData(data){
  if(cfg.schedule.reduce((n,p)=>n+Math.round(p.budget*100),0)!==Math.round(cfg.semesterBudget*100))throw Error('各场预算之和须等于学期总预算。');
  for(const k of ['currentWeight','historyWeight','calibration'])if(!Number.isFinite(c[k])||c[k]<0||c[k]>1)throw Error('奖励权重无效。');if(c.currentWeight!==0.7||c.historyWeight!==0.3||c.calibration!==0.6)throw Error('须保留第14版现行规则：60%校准，70%本场＋30%近期成果。');
  if(!data.exams[0]||data.exams[0].kind!=='baseline'||data.exams.length<2||data.exams.length>cfg.schedule.length+1)throw Error('须保留一场起点和至少一场计奖考试，计奖场数不能超过设置。');
- const current=storedClassWorkspace(cfg.track,cfg.classNo,data.demo===true);
+ const current=independent?null:storedClassWorkspace(cfg.track,cfg.classNo,data.demo===true);
  if(current){for(const locked of current.exams.filter(e=>e.kind!=='baseline'&&e.status==='已锁定')){const next=data.exams.find(e=>e.id===locked.id);if(JSON.stringify(next)!==JSON.stringify(locked)||JSON.stringify(data.schoolCutoffs?.[locked.id])!==JSON.stringify(current.schoolCutoffs?.[locked.id]))throw Error('已确认的成绩与学校参考线不能覆盖。');}}
  const used=new Set();for(let i=0;i<data.exams.length;i++){
   const ex=data.exams[i];if(!ex.id||used.has(ex.id)||!Array.isArray(ex.records)||ex.rewardPolicyVersion!==14||!['full','parallel'].includes(ex.scope))throw Error('考试编号、范围或规则无效。');used.add(ex.id);
@@ -2925,7 +2971,7 @@ function validateAcademicData(data){
  }
  const ledger=RewardEngine.build(data);if(ledger.frames.slice(1,-1).some(f=>!f.ready))throw Error('请先核验此前考试的参考范围和学校线。');if(ledger.frames.some(f=>f.exam.kind!=='baseline'&&!f.ready&&f.exam.status==='已锁定'))throw Error('成绩待核验，不能确认奖金。');return ledger;
 }
-function validateData(data){window.TeacherPersistence?.assertWritable();const ledger=validateAcademicData(data),current=storedClassWorkspace(data.config.track,data.config.classNo,data.demo===true)??{payments:[],lockSnapshots:{}};return validatePayments(data,ledger,current);}
+function validateData(data,{independent=false}={}){window.TeacherPersistence?.assertWritable();const ledger=validateAcademicData(data,{independent}),current=independent?{payments:[],lockSnapshots:{}}:storedClassWorkspace(data.config.track,data.config.classNo,data.demo===true)??{payments:[],lockSnapshots:{}};return validatePayments(data,ledger,current);}
 function bindWorkbookSetup(){
  const file=$('#workbook-file');if(file)file.onchange=async()=>{const selected=file.files?.[0];if(!selected)return;const token=++WorkbookUI.token;WorkbookUI.loading=true;WorkbookUI.error='';captureSettingsDraft();render({resetForms:true});try{const wb=await LocalWorkbook.read(selected),groups=await wb.academic();if(token!==WorkbookUI.token)return;WorkbookUI.workbook=wb;WorkbookUI.groups=groups;WorkbookUI.fileName=selected.name;defaultImportSelection();await importPreview();}catch(e){WorkbookUI.error=e.message}finally{if(token===WorkbookUI.token){WorkbookUI.loading=false;render({resetForms:true})}}};
  for(const [id,key]of [['wb-exam','examId'],['wb-class','classNo'],['wb-baseline','baselineId'],['wb-first','firstId']]){const el=$('#'+id);if(el)el.onchange=async()=>{WorkbookUI[key]=key==='classNo'?Number(el.value):el.value;if(key==='examId'){const group=WorkbookUI.groups.get(WorkbookUI.examId);if(!group.records.some(r=>r.class===WorkbookUI.classNo))WorkbookUI.classNo=group.records[0].class;}if(key==='examId'||key==='classNo')chooseReferenceDefaults();captureSettingsDraft();await refreshImportPreview();render({resetForms:true})};}
@@ -2944,7 +2990,7 @@ window.DashboardTest={previewStudent,Motion,buildTermOutlook,termOutlook,subject
 render();
 window.TeacherPersistence=(()=>{
  const databaseName='xiangshang-teacher-workspace-v1';
- let db=null,token=null,pending=0,saved=false,error='',conflict=false,chain=Promise.resolve();
+ let db=null,token=null,pending=0,saved=false,error='',conflict=false,previousAvailable=false,chain=Promise.resolve();
  function status(){
   const el=document.getElementById('save-status');if(!el)return;
   el.textContent=error?error:pending?'正在自动保存本机账目…':saved?'已自动保存在本机 · 可另存教师版备份':'导入后自动保存在本机 · 可另存教师版备份';
@@ -2955,24 +3001,25 @@ window.TeacherPersistence=(()=>{
   request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);
   request.onblocked=()=>reject(Error('请关闭其他教师页面后重试。'));
  });}
- function read(){return new Promise((resolve,reject)=>{const request=db.transaction('workspace','readonly').objectStore('workspace').get('active');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
+ function read(key='active'){return new Promise((resolve,reject)=>{const request=db.transaction('workspace','readonly').objectStore('workspace').get(key);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
  function restore(data){
-  validateData(data);DATA=clone(data);state.exam=DATA.exams.length-1;state.student=studentsByLatestScore()[0].id;
+  validateData(data,{independent:true});DATA=clone(data);state.exam=DATA.exams.length-1;state.student=studentsByLatestScore()[0].id;
   TeacherUI.compareTo=state.exam;TeacherUI.compareFrom=0;TeacherUI.peerId=null;TeacherUI.paymentExam=null;TeacherUI.dirty=false;
   UI.view=null;UI.snapshots.clear();render({recalculate:true,resetForms:true});
  }
- function write(data){return new Promise((resolve,reject)=>{
+ function write(data,checkpoint=null){return new Promise((resolve,reject)=>{
   const transaction=db.transaction('workspace','readwrite'),store=transaction.objectStore('workspace'),request=store.get('active');let reason=null,nextToken;
   request.onsuccess=()=>{
    if((request.result?.token??null)!==token){conflict=true;reason=Error('另一个教师页面已有新账目，请重新打开本页恢复后继续。');transaction.abort();return;}
    nextToken=globalThis.crypto?.randomUUID?.()??Date.now()+'-'+Math.random();
+   if(checkpoint)store.put({format:1,savedAt:new Date().toISOString(),data:checkpoint},'before-full-restore');
    store.put({format:1,token:nextToken,savedAt:new Date().toISOString(),data},'active');
   };
-  transaction.oncomplete=()=>{token=nextToken;resolve();};transaction.onerror=()=>reject(reason??transaction.error);transaction.onabort=()=>reject(reason??transaction.error??Error('本机保存中断。'));
+  transaction.oncomplete=()=>{token=nextToken;if(checkpoint)previousAvailable=true;resolve();};transaction.onerror=()=>reject(reason??transaction.error);transaction.onabort=()=>reject(reason??transaction.error??Error('本机保存中断。'));
  });}
  const ready=Promise.resolve().then(async()=>{
   try{
-   db=await open();const stored=await read();token=stored?.token??null;
+   db=await open();const stored=await read();token=stored?.token??null;previousAvailable=!!(await read('before-full-restore'))?.data;
    if(stored?.format===1&&stored.data?.appRole==='teacher'&&stored.data.demo!==true){
     if(DATA.demo===true||String(stored.data.updatedAt)>String(DATA.updatedAt))restore(stored.data);
     saved=JSON.stringify(stored.data)===JSON.stringify(DATA);
@@ -2980,16 +3027,24 @@ window.TeacherPersistence=(()=>{
    status();
   }catch(e){error='本机自动保存不可用，请保存教师版备份。';status();}
  });
- function save(data){
+ function save(data,{checkpoint=null}={}){
   if(data.demo===true)return chain;
-  const snapshot=clone(data);pending++;saved=false;status();
+  const snapshot=clone(data),previous=checkpoint?clone(checkpoint):null;pending++;saved=false;status();
   chain=chain.then(async()=>{
    await ready;if(!db)throw Error('浏览器未提供本机存储。');if(conflict)throw Error('请重新打开教师页面恢复最新账目。');
-   await write(snapshot);saved=true;error='';
+   await write(snapshot,previous);saved=true;error='';
   }).catch(e=>{saved=false;error=conflict?'其他页面已更新账目，请重新打开本页继续。':'自动保存失败，请立即保存教师版备份。';toast(error);}).finally(()=>{pending--;status();});
   return chain;
  }
  return {ready,save,flush:async()=>{await ready;await chain;return {saved,error,conflict};},status,
+  async replace(data,checkpoint){
+   await ready;await chain;if(!db)throw Error('本机存储不可用，未切换数据。');if(conflict)throw Error('其他页面已更新账目，请重新打开本页。');
+   if(data.demo===true)throw Error('请使用真实班级的完整教师备份。');
+   if(JSON.stringify(DATA)!==JSON.stringify(checkpoint))throw Error('当前账目已有变化，请重新核对。');
+   validateData(data,{independent:true});await save(data,{checkpoint});if(error||conflict||!saved)throw Error(error||'备份未能保存，当前数据未切换。');
+  },
+  async previous(){await ready;if(!db)return null;return clone((await read('before-full-restore'))?.data??null);},
+  get previousAvailable(){return previousAvailable;},
   assertWritable(){if(conflict)throw Error('另一个教师页面已有更新，请重新打开本页恢复最新账目。');},
   get saved(){return saved&&!pending&&!error;},get pending(){return pending;},get error(){return error;},get conflict(){return conflict;}};
 })();

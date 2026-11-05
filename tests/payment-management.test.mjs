@@ -65,3 +65,28 @@ test('wrong class, unknown students and ambiguous exams are rejected; known uniq
  matrix=rows(ctx,ctx.paymentRecordsCSV(source));matrix[1][matrix[0].indexOf('学生编号')]='old-id';assert.equal(ctx.preparePaymentImport(ctx.csv(matrix)).nameMatches,1);
  matrix=rows(ctx,ctx.paymentRecordsCSV(source));matrix[1][matrix[0].indexOf('考试编号')]='missing';assert.throws(()=>ctx.preparePaymentImport(ctx.csv(matrix)),/找不到唯一对应考试/);
 });
+
+function fullBackupFixture(){
+ const {ctx,data,book}=fixture();data.version=6;
+ Object.assign(data.config,{semesterBudget:37.5,schedule:[{id:'m1',label:'虚拟考试一',budget:15,base:0},{id:'m2',label:'虚拟考试二',budget:22.5,base:0}],gradeReward:{currentWeight:.7,historyWeight:.3,calibration:.6}});
+ const records=()=>data.students.map((s,i)=>({id:s.id,class:4,total:500-i,subjects:{数学:100-i}}));
+ data.exams.unshift({id:'sample-base',kind:'baseline',scope:'full',rewardPolicyVersion:14,date:'',records:records()});
+ data.exams.slice(1).forEach((ex,i)=>Object.assign(ex,{stage:'m'+(i+1),scope:'full',rewardPolicyVersion:14,records:records()}));
+ ctx.window={TeacherPersistence:{assertWritable(){}}};ctx.storedClassWorkspace=()=>data;ctx.subjectNames=()=>['数学'];ctx.RewardEngine={build:()=>book};
+ vm.runInContext(section('function validateAcademicData(','function bindWorkbookSetup('),ctx);
+ return {ctx,data,book};
+}
+test('ordinary restore protects locked exam metadata while an independent full backup can be validated for explicit switching',()=>{
+ const {ctx,data}=fullBackupFixture(),incoming=structuredClone(data),before=JSON.stringify(data);incoming.exams[1].dateNote='另一份完整备份的记录说明';
+ assert.throws(()=>ctx.validateData(incoming),/已确认的成绩与学校参考线不能覆盖/);
+ assert.doesNotThrow(()=>ctx.validateData(incoming,{independent:true}));assert.equal(JSON.stringify(data),before);
+});
+test('an independent backup still rejects invalid awards, overspending and dates without changing the current ledger',()=>{
+ const {ctx,data}=fullBackupFixture();data.payments.push(receipt());const before=JSON.stringify(data),older=structuredClone(data);older.payments=[];
+ assert.throws(()=>ctx.validateData(older),/删除或改写了现有发放记录/);
+ assert.doesNotThrow(()=>ctx.validateData(older,{independent:true}));
+ const overspent=structuredClone(data);overspent.payments[0].cents=1001;assert.throws(()=>ctx.validateData(overspent,{independent:true}),/超过/);
+ const snapshot=structuredClone(data);snapshot.lockSnapshots['sample-1'].amounts['sample-a']++;assert.throws(()=>ctx.validateData(snapshot,{independent:true}),/快照/);
+ const invalidDate=structuredClone(data);invalidDate.payments[0].date='2026-02-30';assert.throws(()=>ctx.validateData(invalidDate,{independent:true}),/日期或金额不合法/);
+ assert.equal(JSON.stringify(data),before);
+});
