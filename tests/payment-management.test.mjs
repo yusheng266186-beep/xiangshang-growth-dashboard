@@ -90,3 +90,26 @@ test('an independent backup still rejects invalid awards, overspending and dates
  const invalidDate=structuredClone(data);invalidDate.payments[0].date='2026-02-30';assert.throws(()=>ctx.validateData(invalidDate,{independent:true}),/日期或金额不合法/);
  assert.equal(JSON.stringify(data),before);
 });
+
+function cohortFixture(){
+ const first={id:'first',kind:'reward',scope:'full',records:[{id:'a',class:4,total:500},{id:'b',class:4,total:490},{id:'p1',class:1,total:520},{id:'p17',class:17,total:510}]};
+ const latest={id:'latest',kind:'reward',scope:'full',records:[{id:'a',class:4,total:530},{id:'p1',class:1,total:540},{id:'p13',class:13,total:520}],absentStudentIds:['b']};
+ const data={config:{classNo:4,fullClasses:[1,4,17],baselineClasses:[1,4],gradeReward:{gradeN:4,firstCommonN:3}},exams:[first,latest]};
+ const start=html.lastIndexOf('// Scope confirmation belongs to one exam'),end=html.indexOf('\n};',html.indexOf('RewardEngine.scope=function(',start))+4;
+ assert.ok(start>0&&end>start);const ctx=vm.createContext({RewardEngine:{},DATA:data});vm.runInContext(html.slice(start,end),ctx);
+ const approve=()=>latest.cohortReview={kind:'teacher-confirmed-complete',confirmed:true,date:'2026-11-06',note:'虚拟测试：完整参考名单已核对',recordCount:latest.records.length,signature:ctx.RewardEngine.cohortKey(latest),referenceExamId:first.id,referenceSignature:ctx.RewardEngine.cohortKey(first)};
+ return {ctx,data,first,latest,approve};
+}
+test('changed cohorts pause by default and an exam-specific review enables shared-class comparison without changing the first reference',()=>{
+ const {ctx,data,first,latest,approve}=cohortFixture(),original=JSON.stringify(first);
+ assert.equal(ctx.RewardEngine.scope(latest,data,{exam:first}).ready,false);approve();
+ const reviewed=ctx.RewardEngine.scope(latest,data,{exam:first});assert.equal(reviewed.ready,true);assert.equal(reviewed.type,'reviewed');assert.deepEqual([...reviewed.comparisonClasses],[1,4]);assert.equal(JSON.stringify(first),original);
+ latest.records.reverse();assert.equal(ctx.RewardEngine.cohortApproved(latest,data),true,'row order must not invalidate membership review');
+});
+test('cohort reviews cannot authorize a different roster, absences, reference or explicitly noncomparable paper',()=>{
+ const {ctx,data,first,latest,approve}=cohortFixture();approve();assert.equal(ctx.RewardEngine.cohortApproved(latest,data),true);
+ latest.records[0].class=99;assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);latest.records[0].class=4;
+ latest.absentStudentIds=[];assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);latest.absentStudentIds=['b'];
+ first.records[0].id='changed-first-reference';assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);first.records[0].id='a';
+ latest.comparable=false;assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);assert.equal(ctx.RewardEngine.scope(latest,data,{exam:first}).ready,false);
+});
