@@ -113,3 +113,27 @@ test('cohort reviews cannot authorize a different roster, absences, reference or
  first.records[0].id='changed-first-reference';assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);first.records[0].id='a';
  latest.comparable=false;assert.equal(ctx.RewardEngine.cohortApproved(latest,data),false);assert.equal(ctx.RewardEngine.scope(latest,data,{exam:first}).ready,false);
 });
+
+test('a student first recorded in a verified cohort gets a personal reference without changing earlier awards',()=>{
+ const data=JSON.parse(html.match(/<script[^>]*id="embedded-data"[^>]*>([\s\S]*?)<\/script>/)[1]);
+ const start=html.lastIndexOf('\nconst RewardEngine={'),end=html.indexOf('\n// DOM elements with a stable identity',start);
+ assert.ok(start>=0&&end>start);
+ const engine=vm.runInNewContext(html.slice(start,end)+'\nRewardEngine',{clone:structuredClone});
+ const [baseline,first,latest]=data.exams,original=engine.build(data),id='sample-late-entry';
+ const moved=latest.records.find(r=>r.class===data.config.classNo),oldId=moved.id;
+ data.students.push({id,name:'虚拟后续同学',class:data.config.classNo});
+ baseline.absentStudentIds=[id];
+ first.absentStudentIds=[...(first.absentStudentIds??[]),id];
+ latest.absentStudentIds=[...(latest.absentStudentIds??[]),oldId];moved.id=id;
+ const peer=latest.records.find(r=>!data.config.baselineClasses.includes(r.class));
+ peer.class=99;
+ latest.cohortReview={kind:'teacher-confirmed-complete',confirmed:true,date:'2026-11-06',note:'虚拟测试：已核对参考范围',recordCount:latest.records.length,signature:engine.cohortKey(latest),referenceExamId:first.id,referenceSignature:engine.cohortKey(first)};
+ const ledger=engine.build(data),frame=ledger.frames.at(-1),row=frame.rows.find(r=>r.id===id);
+ assert.equal(ledger.frames[0].rows.find(r=>r.id===id).absent,true);
+ assert.deepEqual({...ledger.frames[1].allocation.amounts},{...original.frames[1].allocation.amounts,[id]:0});
+ assert.equal(frame.scopeType,'reviewed');assert.equal(frame.ready,true);
+ assert.equal(frame.allocation.amounts[oldId],0);
+ assert.equal(row.equivalentGrade,row.anchor.R);
+ assert.equal(row.points.progress,0);assert.equal(row.recent.samples.length,0);
+ assert.equal(frame.allocation.total,original.frames.at(-1).allocation.total);
+});
