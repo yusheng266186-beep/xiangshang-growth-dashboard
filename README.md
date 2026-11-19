@@ -1,5 +1,7 @@
 # 向上 · 成长奖励面板
 
+[English guide](README.en.md)
+
 教师管理与学生成长展示的静态网页项目。在线演示内的姓名、学校、成绩、参考线、日期与金额全部为独立生成的虚拟示例，不包含真实学生资料，也不包含原始工作簿。
 
 - [演示首页](https://yusheng266186-beep.github.io/xiangshang-growth-dashboard/)
@@ -58,3 +60,7 @@
 发布前运行 `node scripts/verify-public-data.mjs` 和 `node --test tests/*.test.mjs`。GitHub Pages 从 `main` 分支根目录发布；`.nojekyll` 保持文件直接作为静态页面部署。
 
 网页自带字体和浏览器端解析依赖，可直接下载离线使用；这些资源的许可证说明保留在网页源码中。
+
+## 许可
+
+原创页面逻辑、测试和发布校验脚本采用 [MIT](LICENSE)。网页随附的字体和解析组件保留各自的内嵌许可。公开演示数据是独立生成的虚拟示例。
